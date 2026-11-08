@@ -1,0 +1,282 @@
+/* =====================================================
+   AUTH THEME
+===================================================== */
+*{
+  margin: 0px;
+  padding:0px;
+}
+.auth-container {
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    #f8fafc 0%,
+    #eef2ff 40%,
+    #dbeafe 100%
+  );
+}
+
+.auth-row {
+  min-height: 100vh;
+}
+
+/* =====================================================
+   LEFT SECTION
+===================================================== */
+
+.auth-left {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px;
+}
+
+.auth-content {
+  max-width: 560px;
+}
+
+.auth-logo {
+  height: 70px;
+  margin-bottom: 30px;
+}
+
+.auth-title {
+  font-size: 54px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  color: #111827 !important;
+  margin-bottom: 16px !important;
+}
+
+.auth-subtitle {
+  display: block;
+  font-size: 18px;
+  line-height: 1.8;
+  color: #6b7280;
+  margin-bottom: 40px;
+}
+
+.auth-feature {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.auth-feature-icon {
+  color: #1677ff;
+  font-size: 22px;
+}
+
+.auth-banner {
+  width: 100%;
+  margin-top: 40px;
+  border-radius: 24px;
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.08),
+    0 20px 60px rgba(15, 23, 42, 0.12);
+}
+
+/* =====================================================
+   RIGHT SECTION
+===================================================== */
+
+.auth-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.auth-card {
+  width: 100%;
+  max-width: 520px;
+  border: none !important;
+  border-radius: 28px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.08),
+    0 20px 60px rgba(15, 23, 42, 0.12);
+}
+
+.auth-card .ant-card-body {
+  padding: 40px;
+}
+
+.auth-card-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.auth-card-title {
+  margin-bottom: 6px !important;
+  font-weight: 700 !important;
+}
+
+.auth-card-subtitle {
+  color: #6b7280;
+  font-size: 15px;
+}
+
+/* =====================================================
+   INPUTS
+===================================================== */
+
+.auth-card .ant-form-item-label > label {
+  font-weight: 600;
+  color: #111827;
+}
+
+.auth-card .ant-input-affix-wrapper {
+  height: 52px;
+  border-radius: 14px;
+  border: 1px solid #dbe4f0;
+  transition: all 0.3s ease;
+}
+
+.auth-card .ant-input {
+  font-size: 15px;
+}
+
+.auth-card .ant-input-affix-wrapper:hover {
+  border-color: #1677ff;
+}
+
+.auth-card .ant-input-affix-wrapper-focused {
+  border-color: #1677ff !important;
+  box-shadow: 0 0 0 4px rgba(22, 119, 255, 0.08);
+}
+/* Remove Ant Design default spacing */
+.auth-card .ant-form-item {
+  margin-bottom: 10px !important;
+}
+
+/* Remove extra label spacing */
+.auth-card .ant-form-item-label {
+  padding-bottom: 2px !important;
+}
+
+/* Remove error message spacing */
+.auth-card .ant-form-item-explain,
+.auth-card .ant-form-item-extra {
+  min-height: 0 !important;
+  margin-top: 2px !important;
+}
+/* =====================================================
+   PRIMARY BUTTON
+===================================================== */
+
+.auth-primary-btn {
+  height: 54px !important;
+  border-radius: 14px !important;
+  font-size: 15px;
+  font-weight: 600;
+  background: #1677ff !important;
+  border-color: #1677ff !important;
+  transition: all 0.3s ease;
+}
+
+.auth-primary-btn:hover {
+  transform: translateY(-2px);
+  background: #0958d9 !important;
+  border-color: #0958d9 !important;
+}
+
+/* =====================================================
+   GOOGLE BUTTON
+===================================================== */
+
+.auth-google-btn {
+  height: 54px !important;
+  border-radius: 14px !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.auth-google-btn:hover {
+  border-color: #1677ff !important;
+  color: #1677ff !important;
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.auth-footer a {
+  font-weight: 600;
+  color: #1677ff;
+}
+
+.auth-footer a:hover {
+  color: #0958d9;
+}
+
+/* =====================================================
+   LINKS
+===================================================== */
+
+.auth-link {
+  color: #1677ff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  color: #0958d9;
+}
+
+/* =====================================================
+   OTP BOXES
+===================================================== */
+
+.otp-input {
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 14px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 992px) {
+  .auth-left {
+    display: none;
+  }
+
+  .auth-card {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-right {
+    padding: 16px;
+  }
+
+  .auth-card .ant-card-body {
+    padding: 28px;
+  }
+}
+
+@media (max-width: 576px) {
+  .auth-card .ant-card-body {
+    padding: 24px;
+  }
+
+  .auth-title {
+    font-size: 42px !important;
+  }
+}
