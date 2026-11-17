@@ -21,7 +21,6 @@ import {
   BankOutlined,
 } from "@ant-design/icons";
 
-
 import "./CommonSiderStyle.css";
 import { useDispatch, useSelector } from "react-redux";
 import { hasPermission } from "../src/utils/Permission";
@@ -53,9 +52,9 @@ export default function CommonSider() {
   console.log(user_detail.user_type);
   const items = [
     {
-      key: "/dashboard/",
+      key: "/",
       icon: <DashboardOutlined />,
-      label: <Link to="/dashboard/">Dashboard</Link>,
+      label: <Link to="/">Dashboard</Link>,
     },
 
     {
@@ -64,19 +63,21 @@ export default function CommonSider() {
       label: <Link to="/order/">Order</Link>,
     },
 
-    ...(user_detail.user_type==="Customer" ? [
-      {
-       key: "/product-showcase/",
-      icon: <AppstoreOutlined />,
-      label: <Link to="/product-showcase/">Products</Link>, 
-      }
-    ] : [] ),
+    ...(user_detail.user_type === "Customer"
+      ? [
+          {
+            key: "/product-showcase/",
+            icon: <AppstoreOutlined />,
+            label: <Link to="/product-showcase/">Products</Link>,
+          },
+        ]
+      : []),
 
     // ...(user_detail.user_type==="Seller" ? [
     //   {
     //    key: "/product/",
     //   icon: <AppstoreOutlined />,
-    //   label: <Link to="/product/">MyProducts</Link>, 
+    //   label: <Link to="/product/">MyProducts</Link>,
     //   }
     // ] : [] ),
 
@@ -261,19 +262,21 @@ export default function CommonSider() {
             onClick={() => setCollapsed(!collapsed)}
           />
         )}
-
-        <div className="sidebar-logo">
-          <img src="/src/assets/only_logo.png" alt="logo" className="logo-image"  style={{width:60,height:50}}/>
+        <Link to="/" className="sidebar-logo">
+          <img
+            src="/src/assets/only_logo.png"
+            alt="logo"
+            className="logo-image"
+            style={{ width: 60, height: 50 }}
+          />
 
           {!collapsed && (
             <div>
               <div className="logo-title">Econo Shop</div>
-
               <div className="logo-subtitle">Management System</div>
             </div>
           )}
-        </div>
-
+        </Link>
         <Menu
           mode="inline"
           selectedKeys={[location.pathname]}

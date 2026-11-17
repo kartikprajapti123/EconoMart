@@ -288,6 +288,7 @@ const userReducer = createSlice({
       })
       .addCase(updateUserThunkApi.fulfilled, (state, action) => {
         state.status = "fulfilled";
+        state.user_detail=action.payload.data
         const index = state.user_data.findIndex((single_data) => {
           return single_data.id === action.payload.data.id;
         });

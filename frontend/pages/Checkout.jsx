@@ -26,6 +26,7 @@ import {
   Wallet,
   ShieldCheck,
   Truck,
+  Link,
   ShoppingBag,
   Lock,
   CheckCircle2,
@@ -148,10 +149,12 @@ export default function Checkout() {
         });
       });
   };
-  const subtotal = cart_item.reduce(
+  const subtotal = Number(
+  cart_item.reduce(
     (total, item) => total + item.price * item.quantity,
-    0,
-  );
+    0
+  ).toFixed(2)
+);
   const shippingCost = subtotal > 0 ? (cart.shipping_cost ?? 9.99) : 0;
   const taxAmount = +(subtotal * 0.08).toFixed(2);
   const totalAmount = +(subtotal + shippingCost + taxAmount).toFixed(2);

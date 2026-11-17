@@ -75,7 +75,7 @@ export default function CommonRoutes() {
 
           <Route path="/product-details/:id/" element={<ProductDetails />} />
 
-          <Route path="/dashboard/" element={<DashboardSeller />} />
+          <Route path="/" element={<DashboardSeller />} />
           <Route path="/checkout/" element={<Checkout />} />
 
           <Route path="/order/" element={<OrderList />} />

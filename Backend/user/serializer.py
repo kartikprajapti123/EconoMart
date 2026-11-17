@@ -44,7 +44,7 @@ class UserSerialzier(serializers.ModelSerializer):
         return data
 
     def validate(self, data):
-        
+        print(data.get("user_type"))
         email = data.get("email")
         if email:
             if self.instance:
@@ -150,7 +150,8 @@ class UserSerialzier(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop("password")
         password2 = validated_data.pop("password2")
-        user_type = validated_data.pop("user_type")
+        # user_type = validated_data.get("user_type")
+        user_type = validated_data.get("user_type")
 
         user = UserModel.objects.create(**validated_data)
         user.set_password(password)

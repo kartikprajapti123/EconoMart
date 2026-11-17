@@ -461,7 +461,7 @@ class RegisterViewset(ModelViewSet):
             token = encode_jwt(email=user_instance.email)
 
             return Response(
-                {"success": True, "otp": otp, "verification_token": token},
+                {"success": True, "otp": otp,"user_type":user_instance.user_type, "verification_token": token},
                 status=status.HTTP_200_OK,
             )
         else:
@@ -495,6 +495,7 @@ class RegisterViewset(ModelViewSet):
                 return Response(
                     {
                         "success": True,
+                        "user_type":user_instance.user_type,
                         "message": f"Otp Successfully Send to {user_instance.email}",
                         "verification_token": verification_token,
                     },

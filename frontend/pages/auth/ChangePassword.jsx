@@ -56,8 +56,8 @@ export default function ChangePassword() {
         form.resetFields();
 
         setTimeout(() => {
-          navigate("/dashboard");
-        }, 1000);
+          navigate("/");
+        }, 2000);
       })
       .catch((error) => {
         api.error({

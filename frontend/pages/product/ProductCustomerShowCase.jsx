@@ -226,12 +226,12 @@ export default function CustomerShowcase() {
                                   navigate(`/product-details/${item.id}`);
                                 }}
                               />
-                              <Button 
+                              {/* <Button 
                                 shape="circle" 
                                 icon={<HeartOutlined />} 
                                 className="premium-action-trigger"
                                 onClick={(e) => e.stopPropagation()}
-                              />
+                              /> */}
                             </Space>
                           </div>
                         </div>

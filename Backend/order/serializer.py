@@ -7,7 +7,7 @@ from .models import (
 from decimal import Decimal
 from product.models import ProductModel
 from django.db import transaction
-
+from decouple import config
 
 class OrderItemSerializer(serializers.ModelSerializer):
 
@@ -25,6 +25,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     product_color_name = serializers.CharField(
         source="color.product_color_name", read_only=True
     )
+    product_image = serializers.SerializerMethodField()
 
     product_size_name = serializers.CharField(
         source="size.product_size_name", read_only=True
@@ -38,12 +39,22 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "product_name",
             "product_price",
             "color",
+            "product_image",
             "product_color_name",
             "size",
             "product_size_name",
             "quantity",
             "subtotal",
         ]
+        
+    def get_product_image(self, obj):
+        image = obj.product.images.filter(is_primary=True).first()
+    
+        if image and image.image:
+            new_image = f"{config('BACKEND_URL').rstrip('/')}/{image.image.url.lstrip('/')}"
+            return new_image
+    
+        return None
 
 
 

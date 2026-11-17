@@ -78,7 +78,7 @@ const Register = () => {
             "description":res.message
           })
           
-          navigate("/dashboard");
+          navigate("/");
         }
       } else {
         setGoogleCode(code);

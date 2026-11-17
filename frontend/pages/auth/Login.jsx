@@ -74,7 +74,7 @@ export default function Login() {
             description: res.message,
           });
 
-          navigate("/dashboard");
+          navigate("/");
         }
       } else {
         setGoogleCode(code);
@@ -122,7 +122,7 @@ export default function Login() {
         });
         form.resetFields();
         setTimeout(() => {
-          navigate("/dashboard");
+          navigate("/");
         }, 1000);
       })
       .catch((error) => {

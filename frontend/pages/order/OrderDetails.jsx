@@ -94,6 +94,7 @@ export default function OrderDetails() {
           <Avatar 
             shape="square" 
             size={64} 
+            src={record.product_image}
             icon={<ShoppingCartOutlined />} 
             className="product-avatar-container"
           />

@@ -55,10 +55,10 @@ class ProductModel(models.Model):
         related_name="products",
     )
     product_colors = models.ManyToManyField(
-        ProductColorModel, blank=True, related_name="products",null=True
+        ProductColorModel, blank=True, related_name="products"
     )
     product_sizes = models.ManyToManyField(
-        ProductSizeModel, blank=True, related_name="products",null=True
+        ProductSizeModel, blank=True, related_name="products"
     )
     user = models.ForeignKey(
         UserModel,on_delete=models.PROTECT,blank=True, related_name="product_user",null=True

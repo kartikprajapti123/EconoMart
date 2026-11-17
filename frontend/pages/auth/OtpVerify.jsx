@@ -47,7 +47,7 @@ const OtpVerify = () => {
         localStorage.setItem("access",res.token.access)
         localStorage.setItem("refresh",res.token.refresh)
         setTimeout(() => {
-            navigate("/dashboard/");
+            navigate("/");
             
         }, (1500));
         form.resetFields()
@@ -174,7 +174,7 @@ const OtpVerify = () => {
                     marginTop: "20px",
                   }}
                 >
-                  <Text type="secondary">Didn't receive the code?</Text>
+                  {/* <Text type="secondary">Didn't receive the code?</Text>
 
                   <Button
                     type="link"
@@ -183,7 +183,7 @@ const OtpVerify = () => {
                     }}
                   >
                     Resend OTP
-                  </Button>
+                  </Button> */}
                 </div>
               </Form>
             </Card>
