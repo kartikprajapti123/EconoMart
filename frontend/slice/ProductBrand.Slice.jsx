@@ -5,7 +5,7 @@ import {
   updateProductBrandService,
   retrieveProductBrandService,
   destroyProductBrandService,
-} from "../service/ProductBrand.Service";
+} from "../service/ProductBrand.Service.jsx";
 
 export const listProductBrandThunkApi = createAsyncThunk(
   "productBrand/listProductBrandThunkApi",
