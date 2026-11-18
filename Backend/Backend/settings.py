@@ -187,7 +187,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:8000",
+    "https://www.economart.shop",
     
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://www.economart.shop",
+    "https://api.economart.shop",
 ]
 
 STATIC_URL = 'static/'
