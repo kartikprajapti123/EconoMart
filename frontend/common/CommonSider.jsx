@@ -332,7 +332,7 @@ export default function CommonSider() {
         )}
         <Link to="/" className="sidebar-logo">
           <img
-            src="/src/assets/only_logo.png"
+            src="../src/assets/only_logo.png"
             alt="logo"
             className="logo-image"
             style={{ width: 60, height: 50 }}
