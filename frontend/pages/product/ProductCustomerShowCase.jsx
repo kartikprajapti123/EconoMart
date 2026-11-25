@@ -1,301 +1,337 @@
 import React, { useEffect, useState } from "react";
 import {
-  Row,
-  Col,
-  Card,
   Button,
   Input,
   Select,
   Typography,
   Pagination,
-  Spin,
   Badge,
-  Space,
-  notification
+  Drawer,
+  Empty,
+  Grid,
+  Tooltip,
+  notification,
 } from "antd";
 import {
   SearchOutlined,
-  ShoppingCartOutlined,
   HeartOutlined,
+  HeartFilled,
   EyeOutlined,
-  SlidersOutlined
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { listProductThunkApi } from "../../slice/Product.Slice";
 import { useNavigate } from "react-router";
-import { add_to_cart } from "../../slice/Cart.Slice";
+import { listProductThunkApi, openWishlistDrawer, setWishlistDrawerOpen } from "../../slice/Product.Slice";
+import useWishlist from "../product/useWishlist"; // adjust path if needed
+
 const { Title, Text } = Typography;
-const { Option } = Select;
+const { useBreakpoint } = Grid;
+
+const CURRENCY = "EUR"; // change to "USD" if you want to match the dashboard
+const LOW_STOCK_LIMIT = 5;
+const FALLBACK_IMG =
+  "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=500&auto=format&fit=crop&q=60";
+
+const formatPrice = (value) =>
+  new Intl.NumberFormat("en-IE", {
+    style: "currency",
+    currency: CURRENCY,
+  }).format(Number(value) || 0);
+
+const getImage = (item) =>
+  item.product_images?.find((img) => img.is_primary)?.image ||
+  item.product_images?.[0]?.image ||
+  FALLBACK_IMG;
 
 export default function CustomerShowcase() {
-  const [message, contextHolder] = notification.useNotification();
-  const [Search, setSearch] = useState("");
-  const [Page, setPage] = useState(1);
-  const [PageSize, setPageSize] = useState(12);
-  const [CustomOrdering, setCustomOrdering] = useState("");
-  const [StockStatus, setStockStatus] = useState(null);
-  const [Loading, setLoading] = useState(false);
-  const [addToCartLoading, setAddToCartLoading] = useState(false);
+  const [api, contextHolder] = notification.useNotification();
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
 
-  const dispatch=useDispatch()
-  const product = useSelector((state) => state.product);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 12;
+  const [customOrdering, setCustomOrdering] = useState("");
+  const [stockStatus, setStockStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const product = useSelector((state) => state.product);
+  const wishlist = useWishlist();
 
-  const handleProductList = (showLoader) => {
-    if (showLoader) setLoading(true);
-
-    let params = {
-      search: Search,
-      customOrdering: CustomOrdering,
-      stockStatus: StockStatus,
-      page: Page,
-      pageSize: PageSize,
-      productStatus: true,
-    };
-
-    dispatch(listProductThunkApi(params))
-      .unwrap()
-      .then(() => {
-        if (showLoader) setLoading(false);
-      })
-      .catch((error) => {
-        if (showLoader) setLoading(false);
-        message.error({
-          message: "Unable to load collection",
-          description: error || "Network error. Please try again.",
-        });
-      });
-  };
+  // Wait until the user stops typing before calling the API
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setPage(1);
+      setSearch(searchInput);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchInput]);
 
   useEffect(() => {
-    handleProductList(true);
-  }, [Search, Page, PageSize, StockStatus, CustomOrdering]);
+    setLoading(true);
+    dispatch(
+      listProductThunkApi({
+        search,
+        customOrdering,
+        stockStatus,
+        page,
+        pageSize,
+        productStatus: true,
+      })
+    )
+      .unwrap()
+      .catch((error) => {
+        api.error({
+          message: "Couldn't load products",
+          description:
+            (typeof error === "string" && error) ||
+            "Check your connection and try again.",
+          placement: "bottomRight",
+        });
+      })
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, page, stockStatus, customOrdering]);
 
-  const handleAddToCart = (e,product_details) => {
-      setAddToCartLoading(true);
-  
-      let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  
-      const cartItem = {
-        product: product_details.id,
-        product_name: product_details.product_name,
-        price: Number(product_details.price),
-        quantity:product_details.quantity,
-        image:
-          product_details.product_images?.find((img) => img.is_primary)?.image ||
-          product_details.product_images?.[0]?.image,
-        color: selectedColor,
-        size: selectedSize,
-        stock: product_details.stock,
-      };
-  
-      const existingItem = cart.find(
-        (item) =>
-          item.product === cartItem.product &&
-          item.color === cartItem.color &&
-          item.size === cartItem.size,
-      );
-  
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        cart.push(cartItem);
-      }
-  
-      // Save first
-      localStorage.setItem("cart", JSON.stringify(cart));
-  
-      // Then update Redux
-      dispatch(add_to_cart(cart));
-  
-      message.success({
-        message: "Success",
-        description: `${quantity} × ${product_details.product_name} added to cart.`,
-        placement: "bottomRight",
-      });
-  
-      setAddToCartLoading(false);
-    };
+  const goToProduct = (id) => navigate(`/product-details/${id}`);
+
+  const handleWishlist = (e, item) => {
+    e.stopPropagation();
+    const added = wishlist.toggle(item);
+    api.success({
+      message: added ? "Saved to wishlist" : "Removed from wishlist",
+      description: item.product_name,
+      placement: "bottomRight",
+      duration: 2,
+    });
+  };
+
+  const products = product?.product_data || [];
+  const total = product?.totalRecords || 0;
+  const hasFilters = Boolean(search || customOrdering || stockStatus);
+
+  const resetFilters = () => {
+    setSearchInput("");
+    setSearch("");
+    setCustomOrdering("");
+    setStockStatus(null);
+    setPage(1);
+  };
 
   return (
-    <div className="premium-showcase-scope">
+    <div className="shop-scope">
       {contextHolder}
 
-      {/* EDITORIAL HEADER BAR */}
-      <header className="showcase-editorial-header">
-        <div className="header-context">
-          <span className="editorial-eyebrow">All SEASON COLLECTION</span>
-<Title level={1} className="editorial-title">Product Catalog</Title>
-          <div className="editorial-divider"></div>
+      {/* PAGE HEADER */}
+      <header className="shop-header">
+        <div>
+          <Title level={2} className="shop-title">
+            Product Catalog
+          </Title>
+          <Text className="shop-subtitle">
+            Browse everything in stock and save the items you like.
+          </Text>
         </div>
+
+        <Badge count={wishlist.count} size="small" offset={[-4, 6]}>
+  <Button
+    className="shop-wishlist-btn"
+    icon={<HeartOutlined />}
+    onClick={() => {
+      console.log("Wishlist button clicked");
+      dispatch(openWishlistDrawer());
+    }}
+    aria-label={`Open wishlist, ${wishlist.count} items`}
+  >
+    {!isMobile && "Wishlist"}
+  </Button>
+</Badge>
       </header>
 
-      {/* FILTER & CONTROL DECK */}
-      <div className="showcase-control-deck">
-        <Row gutter={[24, 16]} align="middle">
-          <Col xs={24} lg={10}>
-            <Input
-              size="large"
-              className="premium-search-field"
-              value={Search}
-              allowClear
-              prefix={<SearchOutlined className="search-icon-accent" />}
-              placeholder="Search by product template, name, or keywords..."
-              onChange={(e) => {
-                setPage(1);
-                setSearch(e.target.value);
-              }}
-            />
-          </Col>
-          <Col xs={24} lg={14} className="filters-alignment-layer">
-            <Space size={16} wrap className="filter-space-components">
-              <span className="filter-util-text"><SlidersOutlined /> Filter By:</span>
-              
-              <Select
-                size="large"
-                placeholder="Sort Arrangement"
-                className="premium-dropdown-select"
-                allowClear
-                onChange={(value) => {
-                  setPage(1);
-                  setCustomOrdering(value);
-                }}
-              >
-                <Option value="price">Price: Low to High</Option>
-                <Option value="-price">Price: High to Low</Option>
-                <Option value="-created_at">Latest Additions</Option>
-              </Select>
+      {/* FILTER BAR */}
+      <section className="shop-filters" aria-label="Search and filters">
+        <Input
+          size="large"
+          className="shop-search"
+          value={searchInput}
+          allowClear
+          prefix={<SearchOutlined />}
+          placeholder="Search products"
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
+        <Select
+          size="large"
+          className="shop-select"
+          placeholder="Sort by"
+          allowClear
+          value={customOrdering || undefined}
+          onChange={(v) => {
+            setPage(1);
+            setCustomOrdering(v || "");
+          }}
+          options={[
+            { value: "price", label: "Price: low to high" },
+            { value: "-price", label: "Price: high to low" },
+            { value: "-created_at", label: "Newest first" },
+          ]}
+        />
+        <Select
+          size="large"
+          className="shop-select"
+          placeholder="Availability"
+          allowClear
+          value={stockStatus || undefined}
+          onChange={(v) => {
+            setPage(1);
+            setStockStatus(v || null);
+          }}
+          options={[
+            { value: "in_stock", label: "In stock" },
+            { value: "out_of_stock", label: "Out of stock" },
+          ]}
+        />
+      </section>
 
-              <Select
-                size="large"
-                placeholder="Availability Status"
-                className="premium-dropdown-select"
-                allowClear
-                onChange={(value) => {
-                  setPage(1);
-                  setStockStatus(value);
-                }}
-              >
-                <Option value="in_stock">Available Immediately</Option>
-                <Option value="out_of_stock">Out of Stock</Option>
-              </Select>
-            </Space>
-          </Col>
-        </Row>
-      </div>
+      {!loading && (
+        <div className="shop-result-bar">
+          <Text type="secondary">
+            {total} {total === 1 ? "product" : "products"}
+          </Text>
+          {hasFilters && (
+            <Button type="link" size="small" onClick={resetFilters}>
+              Clear filters
+            </Button>
+          )}
+        </div>
+      )}
 
-      {/* GALLERY GRID */}
-      {Loading ? (
-        <div className="premium-grid-loader">
-          <Spin size="large" />
-          <Text className="loader-text">Refining catalog layout...</Text>
+      {/* GRID */}
+      {loading ? (
+        <div className="shop-grid" aria-busy="true">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div className="shop-card shop-skeleton" key={i}>
+              <div className="shop-skel-img" />
+              <div className="shop-skel-line w60" />
+              <div className="shop-skel-line w90" />
+              <div className="shop-skel-line w40" />
+            </div>
+          ))}
+        </div>
+      ) : products.length === 0 ? (
+        <div className="shop-empty">
+          <Empty
+            description={
+              hasFilters
+                ? "No products match your search."
+                : "No products are available right now."
+            }
+          >
+            {hasFilters && (
+              <Button type="primary" onClick={resetFilters}>
+                Clear filters
+              </Button>
+            )}
+          </Empty>
         </div>
       ) : (
-        <>
-          {/* Centered item flow setup */}
-          <div className="product-grid-flex-container">
-            {product?.product_data?.map((item) => {
-              const primaryImage = item.product_images?.find((img) => img.is_primary);
-              const isOutOfStock = item.stock <= 0;
+        <div className="shop-grid">
+          {products.map((item) => {
+            const outOfStock = item.stock <= 0;
+            const lowStock = !outOfStock && item.stock <= LOW_STOCK_LIMIT;
+            const liked = wishlist.isWishlisted(item.id);
 
-              return (
-                <div className="grid-item-card-wrapper" key={item.id}>
-                  <Badge.Ribbon 
-                    text={isOutOfStock ? "SOLD OUT" : `${item.product_brand_name || 'NEW'}`} 
-                    className={isOutOfStock ? "premium-ribbon-sold" : "premium-ribbon-active"}
-                  >
-                    <Card
-                      hoverable
-                      bordered={false}
-                      className="premium-showcase-card"
-                      cover={
-                        <div className="premium-image-canvas" onClick={() => navigate(`/product-details/${item.id}`)}>
-                          <img
-                            alt={item.product_name}
-                            src={primaryImage?.image || "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=500&auto=format&fit=crop&q=60"}
-                            className="premium-fluid-img"
-                          />
-                          <div className="premium-image-mask-overlay">
-                            <Space size="middle">
-                              <Button 
-                                shape="circle" 
-                                icon={<EyeOutlined />} 
-                                className="premium-action-trigger"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(`/product-details/${item.id}`);
-                                }}
-                              />
-                              {/* <Button 
-                                shape="circle" 
-                                icon={<HeartOutlined />} 
-                                className="premium-action-trigger"
-                                onClick={(e) => e.stopPropagation()}
-                              /> */}
-                            </Space>
-                          </div>
-                        </div>
-                      }
+            return (
+              <article className="shop-card" key={item.id}>
+                <div
+                  className="shop-card-media"
+                  onClick={() => goToProduct(item.id)}
+                  role="link"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && goToProduct(item.id)}
+                  aria-label={`View ${item.product_name}`}
+                >
+                  <img
+                    src={getImage(item)}
+                    alt={item.product_name}
+                    loading="lazy"
+                    className={outOfStock ? "is-dim" : ""}
+                  />
+
+                  {outOfStock && (
+                    <span className="shop-chip shop-chip-muted">Sold out</span>
+                  )}
+                  {lowStock && (
+                    <span className="shop-chip shop-chip-warn">
+                      {item.stock} left
+                    </span>
+                  )}
+
+                  <Tooltip title={liked ? "Remove from wishlist" : "Save to wishlist"}>
+                    <button
+                      type="button"
+                      className={`shop-heart ${liked ? "is-active" : ""}`}
+                      onClick={(e) => handleWishlist(e, item)}
+                      aria-pressed={liked}
+                      aria-label={liked ? "Remove from wishlist" : "Save to wishlist"}
                     >
-                      <div className="premium-card-body-wrapper" onClick={() => navigate(`/product-details/${item.id}`)}>
-                        <span className="premium-card-brand-meta">
-                          {item.product_brand_name ? item.product_brand_name.toUpperCase() : "ORIGINAL CLASSIC"}
-                        </span>
-                        
-                        <h3 className="premium-card-product-title">
-                          {item.product_name}
-                        </h3>
-
-                        {/* ARRANGED STOCK NOTICE AND PRICING AREA */}
-                        <div className="premium-card-info-stack">
-                          {item.stock <= 5 && !isOutOfStock ? (
-                            <span className="premium-urgency-tag">Only {item.stock} units remaining</span>
-                          ) : isOutOfStock ? (
-                            <span className="premium-urgency-tag out-of-stock-text">Restocking soon</span>
-                          ) : (
-                            <span className="premium-stock-placeholder-blank" />
-                          )}
-                          
-                          <span className="premium-price-currency">
-                            € {parseFloat(item.price || 0).toLocaleString('en-IE', { minimumFractionDigits: 2 })}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="premium-card-cta-footer">
-                        <Button
-                          type="primary"
-                          block
-                          size="large"
-                          disabled={isOutOfStock}
-                          icon={<EyeOutlined />}
-                          className="premium-primary-cta"
-                          onClick={(e)=>{navigate(`/product-details/${item.id}/`)}}
-                        >
-                          {isOutOfStock ? "View More" : "View More"}
-                        </Button>
-                      </div>
-                    </Card>
-                  </Badge.Ribbon>
+                      {liked ? <HeartFilled /> : <HeartOutlined />}
+                    </button>
+                  </Tooltip>
                 </div>
-              );
-            })}
-          </div>
 
-          {/* EDITORIAL PAGINATION */}
-          {product?.totalRecords > PageSize && (
-            <div className="premium-pagination-wrapper">
-              <Pagination
-                current={Page}
-                pageSize={PageSize}
-                total={product.totalRecords}
-                showSizeChanger={false}
-                onChange={(page) => setPage(page)}
-              />
-            </div>
-          )}
-        </>
+                <div className="shop-card-body">
+                  {item.product_brand_name && (
+                    <span className="shop-brand">{item.product_brand_name}</span>
+                  )}
+                  <h3
+                    className="shop-name"
+                    title={item.product_name}
+                    onClick={() => goToProduct(item.id)}
+                  >
+                    {item.product_name}
+                  </h3>
+
+                  <div className="shop-card-foot">
+                    <span className="shop-price">{formatPrice(item.price)}</span>
+                    <Button
+                      type="primary"
+                      icon={<EyeOutlined />}
+                      className="shop-cta"
+                      onClick={() => goToProduct(item.id)}
+                    >
+                      {isMobile ? "View" : "View details"}
+                    </Button>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       )}
+
+      {/* PAGINATION */}
+      {!loading && total > pageSize && (
+        <div className="shop-pagination">
+          <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={total}
+            showSizeChanger={false}
+            simple={isMobile}
+            onChange={(p) => {
+              setPage(p);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
+        </div>
+      )}
+
+      {/* WISHLIST DRAWER */}
+      
     </div>
   );
 }

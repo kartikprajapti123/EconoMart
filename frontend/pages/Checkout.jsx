@@ -32,6 +32,7 @@ import {
   CheckCircle2,
   SendToBack,
 } from "lucide-react";
+import { LockOutlined } from "@ant-design/icons";
 import {} from //   getCartThunkApi,
 //   getCountriesThunkApi,
 //   getStatesThunkApi,
@@ -42,7 +43,7 @@ import { listCityThunkApi } from "../slice/City.Slice";
 import { listStateThunkApi } from "../slice/State.Slice";
 import { listCountryThunkApi } from "../slice/Country.Slice";
 import { createOrderThunkApi } from "../slice/Order.Slice";
-import { useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { verifyPaymentOrderThunkApi } from "../slice/Order.Slice";
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -57,6 +58,7 @@ export default function Checkout() {
   let state_data = useSelector((state) => state.state.data);
   let city_data = useSelector((state) => state.city.data);
   const [message, contextHolder] = notification.useNotification();
+  const navigate=useNavigate()
   const cart_item = JSON.parse(localStorage.getItem("cart")) || [];
   console.log(cart_item);
   const dispatch = useDispatch();
@@ -66,6 +68,7 @@ export default function Checkout() {
   };
 
   const countries = useSelector((state) => state.order?.countries) || [];
+  const is_authenticated=localStorage.getItem("access")
 
   useEffect(() => {
     handleListCountry();
@@ -207,6 +210,46 @@ export default function Checkout() {
         });
       });
   };
+  if (!is_authenticated) {
+  return (
+    <div className="checkout-auth-required">
+      <div className="checkout-auth-card">
+        <LockOutlined className="checkout-auth-icon" />
+
+        <Title level={3}>Login Required</Title>
+
+        <Text type="secondary">
+          Please log in or create an account before proceeding
+          with checkout.
+        </Text>
+
+        <div className="checkout-auth-actions">
+          <Button
+            type="primary"
+            size="large"
+            onClick={() => navigate("/login/")}
+          >
+            Login
+          </Button>
+
+          <Button
+            size="large"
+            onClick={() => navigate("/register/")}
+          >
+            Sign Up
+          </Button>
+        </div>
+
+        <Button
+          type="link"
+          onClick={() => navigate("/product-showcase/")}
+        >
+          Continue shopping
+        </Button>
+      </div>
+    </div>
+  );
+}
 
   if (loading) {
     return (

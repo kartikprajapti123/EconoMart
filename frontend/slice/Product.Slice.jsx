@@ -100,8 +100,22 @@ const productReducer = createSlice({
     product_data: [],
     product_details:[],
     totalRecords: 0,
+    wishlistDrawerOpen: false,
   },
-  reducers: {},
+  reducers: {
+    openWishlistDrawer: (state) => {
+    console.log("openwishlist called ",)
+
+    state.wishlistDrawerOpen = true;
+  },
+  closeWishlistDrawer: (state) => {
+    state.wishlistDrawerOpen = false;
+  },
+  setWishlistDrawerOpen: (state, action) => {
+    console.log("setwishlist called ",action.payload)
+    state.wishlistDrawerOpen = Boolean(action.payload);
+  },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(listProductThunkApi.pending, (state) => {
@@ -178,3 +192,8 @@ const productReducer = createSlice({
 });
 
 export default productReducer.reducer;
+export const {
+  openWishlistDrawer,
+  closeWishlistDrawer,
+  setWishlistDrawerOpen,
+} = productReducer.actions;

@@ -18,7 +18,7 @@ import ResetPassword from "../pages/settings/ResetPassword.jsx";
 import UserList from "../pages/user/UserList.jsx";
 import UserCreateUpdate from "../pages/user/UserCreateUpdate.jsx";
 import ProductDetails from "../pages/product/ProductDetails.jsx";
-import DashboardSeller from "../pages/dashboard/Dashboard.jsx";
+import Dashboard from "../pages/dashboard/Dashboard.jsx";
 import Checkout from "../pages/Checkout.jsx";
 import OrderList from "../pages/order/OrderList.jsx";
 import OrderDetails from "../pages/order/OrderDetails.jsx";
@@ -75,7 +75,7 @@ export default function CommonRoutes() {
 
           <Route path="/product-details/:id/" element={<ProductDetails />} />
 
-          <Route path="/" element={<DashboardSeller />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/checkout/" element={<Checkout />} />
 
           <Route path="/order/" element={<OrderList />} />

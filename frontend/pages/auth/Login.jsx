@@ -20,6 +20,7 @@ import {
 import {
   MailOutlined,
   LockOutlined,
+  ArrowLeftOutlined,
   GoogleOutlined,
   SafetyCertificateOutlined,
   RocketOutlined,
@@ -179,7 +180,11 @@ export default function Login() {
           {/* Left Section */}
           <Col xs={0} lg={12} className="auth-left">
             <div className="auth-content">
-              <img src="/src/assets/only_logo.png" alt="Logo" className="auth-logo"  />
+              <img
+                src="/src/assets/only_logo.png"
+                alt="Logo"
+                className="auth-logo"
+              />
 
               <Title className="auth-title">Welcome Back</Title>
 
@@ -213,101 +218,98 @@ export default function Login() {
           </Col>
 
           {/* Right Section */}
-          <Col xs={24} lg={12} className="auth-right">
-            <Card className="auth-card">
-              <div className="auth-card-header">
-                <Title level={2} className="auth-card-title">
-                  Sign In
-                </Title>
+          {/* Replace your whole <Col className="auth-right"> ... </Col> with this.
+    Imports you already have are enough (ArrowLeftOutlined, MailOutlined,
+    LockOutlined, GoogleOutlined, Button, Card, Divider, Form, Input, Typography, Link). */}
 
-                <Text className="auth-card-subtitle">
-                  Access your account and continue growing your business
-                </Text>
-              </div>
+<Col xs={24} lg={12} className="auth-right">
+  <Card className="auth-card">
+    {/* Top bar: back button */}
+    <div className="auth-card-topbar">
+      <Button
+        type="text"
+        className="auth-back-btn"
+        icon={<ArrowLeftOutlined />}
+        onClick={() =>
+          window.history.length > 1 ? navigate(-1) : navigate("/")
+        }
+      >
+        Back
+      </Button>
+    </div>
 
-              <Form
-                form={form}
-                layout="vertical"
-                size="large"
-                onFinish={onFinish}
-              >
-                <Form.Item
-                  label="Email Address"
-                  name="email"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your email address",
-                    },
-                    {
-                      type: "email",
-                      message: "Please enter a valid email address",
-                    },
-                  ]}
-                >
-                  <Input
-                    prefix={<MailOutlined />}
-                    placeholder="john@example.com"
-                  />
-                </Form.Item>
+    {/* Heading */}
+    <div className="auth-card-header">
+      <Title level={2} className="auth-card-title">
+        Sign in
+      </Title>
+      <Text className="auth-card-subtitle">
+        Access your account and continue growing your business
+      </Text>
+    </div>
 
-                <Form.Item
-                  label="Password"
-                  name="password"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your password",
-                    },
-                  ]}
-                >
-                  <Input.Password
-                    prefix={<LockOutlined />}
-                    placeholder="Enter your password"
-                  />
-                </Form.Item>
+    <Form form={form} layout="vertical" size="large" onFinish={onFinish}>
+      <Form.Item
+        label="Email address"
+        name="email"
+        rules={[
+          { required: true, message: "Please enter your email address" },
+          { type: "email", message: "Please enter a valid email address" },
+        ]}
+      >
+        <Input
+          prefix={<MailOutlined />}
+          placeholder="john@example.com"
+          autoComplete="email"
+        />
+      </Form.Item>
 
-                <div
-                  style={{
-                    textAlign: "right",
-                    marginBottom: "20px",
-                  }}
-                >
-                  <Link to="/forgot-password/">Forgot Password?</Link>
-                </div>
+      <Form.Item
+        label="Password"
+        name="password"
+        rules={[{ required: true, message: "Please enter your password" }]}
+      >
+        <Input.Password
+          prefix={<LockOutlined />}
+          placeholder="Enter your password"
+          autoComplete="current-password"
+        />
+      </Form.Item>
 
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  block
-                  loading={loading}
-                  className="auth-primary-btn"
-                >
-                  Sign In
-                </Button>
+      <div className="auth-forgot-row">
+        <Link to="/forgot-password/">Forgot password?</Link>
+      </div>
 
-                <Divider>OR</Divider>
+      <Button
+        type="primary"
+        htmlType="submit"
+        block
+        loading={loading}
+        className="auth-primary-btn"
+      >
+        Sign in
+      </Button>
 
-                <Button
-                  block
-                  size="large"
-                  loading={loading}
-                  icon={<GoogleOutlined />}
-                  className="auth-google-btn"
-                  onClick={() => handleGoogleLogin()}
-                >
-                  Continue with Google
-                </Button>
+      <Divider className="auth-divider">or</Divider>
 
-                <div className="auth-footer">
-                  <Text type="secondary">
-                    Don't have an account?{" "}
-                    <Link to="/register/">Create Account</Link>
-                  </Text>
-                </div>
-              </Form>
-            </Card>
-          </Col>
+      <Button
+        block
+        loading={loading}
+        icon={<GoogleOutlined />}
+        className="auth-google-btn"
+        onClick={() => handleGoogleLogin()}
+      >
+        Continue with Google
+      </Button>
+
+      <div className="auth-footer">
+        <Text type="secondary">
+          Don't have an account? <Link to="/register/">Create account</Link>
+        </Text>
+      </div>
+    </Form>
+  </Card>
+</Col>
         </Row>
       </div>
     </>

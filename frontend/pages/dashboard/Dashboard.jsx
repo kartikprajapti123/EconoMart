@@ -29,6 +29,7 @@ import {
 import axios from "axios";
 
 import { hasPermission } from "../../src/utils/Permission";
+import { useNavigate } from "react-router";
 
 const { Title, Text } = Typography;
 
@@ -36,7 +37,15 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const [message, contextHolder] = notification.useNotification();
+  const navigate = useNavigate();
 
+const is_authenticated = Boolean(localStorage.getItem("access"));
+
+useEffect(() => {
+  if (!is_authenticated) {
+    navigate("/product-showcase/", { replace: true });
+  }
+}, [is_authenticated, navigate]);
   const dispatch = useDispatch();
   const userDetail = useSelector((state) => state.user.user_detail);
   const user_type = userDetail?.user_type;

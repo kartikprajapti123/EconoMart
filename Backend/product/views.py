@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 import json
 from product.models import (
     ProductModel,
@@ -36,8 +36,7 @@ class ProductViewSet(ModelViewSet):
     )
 
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
+    permission_classes = [AllowAny]
 
     filter_backends = [SearchFilter, OrderingFilter]
 
@@ -60,8 +59,9 @@ class ProductViewSet(ModelViewSet):
         user=request.user
             
         queryset = self.filter_queryset(self.get_queryset())
-        if user.user_type=="Seller":
-            queryset=queryset.filter(user=user)
+        if user.is_authenticated:
+            if user.user_type=="Seller":
+                queryset=queryset.filter(user=user)
         
         brand_id = request.query_params.get("brand_id")
         if brand_id:

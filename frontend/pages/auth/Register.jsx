@@ -24,6 +24,7 @@ import {
   LockOutlined,
   GoogleOutlined,
   ShoppingOutlined,
+  ArrowLeftOutlined,
   SafetyCertificateOutlined,
   RocketOutlined,
 } from "@ant-design/icons";
@@ -216,6 +217,18 @@ const Register = () => {
           {/* Right Section */}
           <Col xs={24} lg={12} className="auth-right">
             <Card className="auth-card">
+              <div className="auth-card-topbar">
+      <Button
+        type="text"
+        className="auth-back-btn"
+        icon={<ArrowLeftOutlined />}
+        onClick={() =>
+          window.history.length > 1 ? navigate(-1) : navigate("/")
+        }
+      >
+        Back
+      </Button>
+    </div>
               <div className="auth-card-header">
                 <Title level={2} className="auth-card-title">
                   Create Account

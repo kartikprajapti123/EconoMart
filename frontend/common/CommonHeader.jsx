@@ -23,6 +23,8 @@ import {
   LogoutOutlined,
   SettingOutlined,
   ProfileOutlined,
+  LoginOutlined,
+  UserAddOutlined,
   ShoppingCartOutlined,
   DeleteOutlined,
   ArrowRightOutlined,
@@ -58,9 +60,11 @@ export default function CommonHeader() {
   const dispatch = useDispatch();
   const [message, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
-  const all_message_unread_count=useSelector((state)=>state.chat.all_unread_count)
+  const all_message_unread_count = useSelector(
+    (state) => state.chat.all_unread_count,
+  );
   // Control Dropdown Visibility
-  console.log('all_message_unread_count',all_message_unread_count)
+  console.log("all_message_unread_count", all_message_unread_count);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const socketRef = useRef(null);
 
@@ -68,6 +72,8 @@ export default function CommonHeader() {
   const cart = useSelector((state) => state.cart.cart);
   const isCartOpen = useSelector((state) => state.cart.isCartOpen);
   const user_detail = useSelector((state) => state.user.user_detail);
+  const is_authenticated = localStorage.getItem("access");
+  console.log(is_authenticated);
   const notification_unreadCount = useSelector(
     (state) => state.notification.unreadCount,
   );
@@ -81,9 +87,11 @@ export default function CommonHeader() {
     dispatch(add_to_cart(data));
 
     if (
+      is_authenticated ||
       user_detail?.user_type === "Customer" ||
       user_detail?.user_type === "Seller"
     ) {
+      console.log(1);
       dispatch(getUnreadCountThunkApi());
       dispatch(listNotificationThunkApi());
     }
@@ -92,71 +100,71 @@ export default function CommonHeader() {
   // ----------------------------------------------------
   // Real-Time WebSocket Connection for Notifications
   // ----------------------------------------------------
-  useEffect(() => {
-    const isEligibleUser =
-      user_detail?.user_type === "Customer" ||
-      user_detail?.user_type === "Seller";
+  if (is_authenticated) {
+    useEffect(() => {
+      const isEligibleUser =
+        user_detail?.user_type === "Customer" ||
+        user_detail?.user_type === "Seller";
 
-    console.log(isEligibleUser);
-    if (!isEligibleUser) return;
-    // Use wss:// for production HTTPS, or ws:// for HTTP
-    // const wsHost = window.location.host;
-    const accessToken = localStorage.getItem("access");
-    const socketUrl = `${import.meta.env.VITE_WEBSOCKET_FRONTEND_URL}notification/?token=${accessToken}`;
+      console.log(isEligibleUser);
+      if (!isEligibleUser) return;
+      // Use wss:// for production HTTPS, or ws:// for HTTP
+      // const wsHost = window.location.host;
+      const accessToken = localStorage.getItem("access");
+      const socketUrl = `${import.meta.env.VITE_WEBSOCKET_FRONTEND_URL}notification/?token=${accessToken}`;
 
-    const ws = new WebSocket(socketUrl);
-    socketRef.current = ws;
+      const ws = new WebSocket(socketUrl);
+      socketRef.current = ws;
 
-    ws.onopen = () => {
-      console.log("WebSocket connected to /ws/notification/");
-    };
+      ws.onopen = () => {
+        console.log("WebSocket connected to /ws/notification/");
+      };
 
-    ws.onmessage = (event) => {
-    try {
-        const data = JSON.parse(event.data);
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
 
-        if (data.type === "chat_change") {
-
+          if (data.type === "chat_change") {
             // Don't fetch if already on the chat page
             if (location.pathname !== "/chat") {
-                dispatch(getUnreadMessageChatThunkApi());
+              dispatch(getUnreadMessageChatThunkApi());
             }
 
             return;
-        }
+          }
 
-        // Normal notification
-        if (data.title || data.message) {
+          // Normal notification
+          if (data.title || data.message) {
             notification.info({
-                message: data.title || "New Notification",
-                description: data.message || "",
-                placement: "topRight",
+              message: data.title || "New Notification",
+              description: data.message || "",
+              placement: "topRight",
             });
+          }
+          console.log(2);
+          dispatch(getUnreadCountThunkApi());
+          dispatch(listNotificationThunkApi());
+        } catch (err) {
+          console.error(err);
         }
+      };
 
-        dispatch(getUnreadCountThunkApi());
-        dispatch(listNotificationThunkApi());
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
 
-    } catch (err) {
-        console.error(err);
-    }
-};
+      ws.onclose = () => {
+        console.log("WebSocket connection closed");
+      };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
+      // Cleanup connection on unmount
+      return () => {
+        if (ws) ws.close();
+      };
+    }, [dispatch, user_detail]);
 
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-
-    // Cleanup connection on unmount
-    return () => {
-      if (ws) ws.close();
-    };
-  }, [dispatch, user_detail]);
-
-  // Logout Handler
+    // Logout Handler
+  }
   const handleLogOut = () => {
     const data = {
       refresh: localStorage.getItem("refresh"),
@@ -173,8 +181,9 @@ export default function CommonHeader() {
         localStorage.removeItem("access");
         localStorage.removeItem("refresh");
         localStorage.removeItem("cart");
-
-        navigate("/login/");
+      
+        
+       window.location.href = "/product-showcase/";
       })
       .catch((error) => {
         message.error({
@@ -218,17 +227,22 @@ export default function CommonHeader() {
     }
   };
 
-  const handleUnreadMessageCount=()=>{
-    dispatch(getUnreadMessageChatThunkApi()).unwrap().then((res)=>{}).catch((error)=>{
-      message.error({
-        'title':"Error",
-        "description":error
-      })
-    })
-  }
-  useEffect(()=>{
-    handleUnreadMessageCount()
-  },[])
+  const handleUnreadMessageCount = () => {
+    dispatch(getUnreadMessageChatThunkApi())
+      .unwrap()
+      .then((res) => {})
+      .catch((error) => {
+        message.error({
+          title: "Error",
+          description: error,
+        });
+      });
+  };
+  useEffect(() => {
+    if (is_authenticated) {
+      handleUnreadMessageCount();
+    }
+  }, []);
 
   const handleToggleRead = (e, item) => {
     e.stopPropagation();
@@ -487,70 +501,106 @@ export default function CommonHeader() {
         {/* Left Side */}
         <div className="header-welcome">
           <div className="welcome-title">
-            Welcome back, {user_detail.username} 👋
+            Economart, {user_detail.username} 👋
           </div>
         </div>
 
         {/* Right Side */}
+        {/* Needs only 2 extra icon imports:
+    import { LoginOutlined, UserAddOutlined } from "@ant-design/icons";
+    Everything else (Badge, Button, Dropdown, Avatar, icons, handlers) you already have. */}
+
         <div className="header-right">
-          {user_detail.user_type === "Customer" ||
-          user_detail.user_type === "Seller" ? (
-            <Dropdown
-              dropdownRender={() => notificationDropdownMenu}
-              trigger={["click"]}
-              placement="bottomRight"
-              open={dropdownOpen}
-              onOpenChange={(flag) => setDropdownOpen(flag)}
-            >
-              <Badge count={notification_unreadCount} size="small">
+          {/* Notifications – logged-in Customer / Seller */}
+          {is_authenticated &&
+            ["Customer", "Seller"].includes(user_detail?.user_type) && (
+              <Dropdown
+                dropdownRender={() => notificationDropdownMenu}
+                trigger={["click"]}
+                placement="bottomRight"
+                open={dropdownOpen}
+                onOpenChange={(flag) => setDropdownOpen(flag)}
+              >
+                <Badge count={notification_unreadCount} size="small">
+                  <Button
+                    type="text"
+                    shape="circle"
+                    className="header-icon-btn"
+                    aria-label="Notifications"
+                    icon={<NotificationOutlined />}
+                  />
+                </Badge>
+              </Dropdown>
+            )}
+
+          {/* Messages – logged-in Customer / Seller */}
+          {is_authenticated &&
+            ["Customer", "Seller"].includes(user_detail?.user_type) && (
+              <Badge count={all_message_unread_count} size="small">
                 <Button
                   type="text"
                   shape="circle"
                   className="header-icon-btn"
-                  icon={<NotificationOutlined />}
+                  aria-label="Messages"
+                  icon={<MessageOutlined />}
+                  onClick={() => navigate("/chat")}
                 />
               </Badge>
-            </Dropdown>
-          ) : null}
+            )}
 
-          {["Customer", "Seller"].includes(user_detail.user_type) && (
-            <Badge count={all_message_unread_count} size="small">
-            <Button
-              type="text"
-              shape="circle"
-              className="header-icon-btn"
-              icon={<MessageOutlined />}
-              onClick={() => navigate("/chat")}
-            />
-            </Badge>
-          )}
-
-          {user_detail.user_type === "Customer" ? (
-            <Badge count={cartTotalCount} size="small">
+          {/* Cart – guests and Customers */}
+          {(!is_authenticated || user_detail?.user_type === "Customer") && (
+            <Badge count={cartTotalCount} size="small" overflowCount={99}>
               <Button
                 type="text"
                 shape="circle"
                 className="header-icon-btn"
+                aria-label="Cart"
                 icon={<ShoppingCartOutlined />}
                 onClick={() => dispatch(isCartOpen ? closeCart() : openCart())}
               />
             </Badge>
-          ) : null}
+          )}
 
-          <Dropdown
-            menu={{ items: profileItems }}
-            trigger={["click"]}
-            placement="bottomRight"
-          >
-            <div className="profile-wrapper">
-              <Avatar
-                size={42}
-                src={user_detail?.profile_image || undefined}
-                icon={!user_detail?.profile_image && <UserOutlined />}
-                className="profile-avatar"
-              />
+          {/* Profile when logged in, Login / Sign up when not */}
+          {is_authenticated ? (
+            <Dropdown
+              menu={{ items: profileItems }}
+              trigger={["click"]}
+              placement="bottomRight"
+            >
+              <div className="profile-wrapper">
+                <Avatar
+                  size={42}
+                  src={user_detail?.profile_image || undefined}
+                  icon={!user_detail?.profile_image && <UserOutlined />}
+                  className="profile-avatar"
+                />
+              </div>
+            </Dropdown>
+          ) : (
+            <div className="auth-buttons">
+              <Button
+                className="auth-btn"
+                icon={<LoginOutlined />}
+                aria-label="Login"
+                title="Login"
+                onClick={() => navigate("/login")}
+              >
+                <span className="auth-btn-text">Login</span>
+              </Button>
+              <Button
+                type="primary"
+                className="auth-btn"
+                icon={<UserAddOutlined />}
+                aria-label="Sign up"
+                title="Sign up"
+                onClick={() => navigate("/register")}
+              >
+                <span className="auth-btn-text">Sign up</span>
+              </Button>
             </div>
-          </Dropdown>
+          )}
         </div>
       </Header>
 

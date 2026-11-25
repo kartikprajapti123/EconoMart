@@ -114,14 +114,19 @@
     padding: 0 16px;
   }
 }
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .welcome-title {
     font-size: 16px;
     color: transparent;
+    /* position: relative; */
   }
 
   .welcome-title::after {
-    content: "";
+    content: "👋";
     color: #1677ff;
+    position: absolute;
+    left: 65px;
+    top:3px ;
+    white-space: nowrap;
   }
 }
