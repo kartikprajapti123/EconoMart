@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
-import logo from "../../assets/Logo.png"; // adjust path if your file is elsewhere
+import logo from "../src/assets/Logo.png"; // adjust path if your file is elsewhere
 
 export const CommonFooter = () => {
   return (
