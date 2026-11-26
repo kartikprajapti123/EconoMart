@@ -50,7 +50,7 @@ export default function NotFound() {
             size="large"
             icon={<HomeOutlined />}
             className="error-primary-btn"
-            onClick={() => navigate("/dashboard/")}
+            onClick={() => navigate("/")}
           >
             Return to Home Page
           </Button>
