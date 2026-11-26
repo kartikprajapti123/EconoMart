@@ -17,7 +17,7 @@ import {
   Radio,
   Space,
 } from "antd";
-import onlyLogo from "../src/assets/only_logo.png"
+import onlyLogo from "../../src/assets/only_logo.png"
 
 import {
   UserOutlined,

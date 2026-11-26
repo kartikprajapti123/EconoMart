@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./auth.css";
-import onlyLogo from "../src/assets/only_logo.png"
+import onlyLogo from "../../src/assets/only_logo.png"
+
 import {
   Row,
   Col,

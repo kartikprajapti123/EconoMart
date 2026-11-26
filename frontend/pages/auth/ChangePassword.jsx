@@ -17,7 +17,7 @@ import {
   SafetyCertificateOutlined,
   RocketOutlined,
 } from "@ant-design/icons";
-import onlyLogo from "../src/assets/only_logo.png"
+import onlyLogo from "../../src/assets/only_logo.png"
 
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
