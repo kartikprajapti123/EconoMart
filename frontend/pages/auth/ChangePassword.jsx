@@ -17,6 +17,7 @@ import {
   SafetyCertificateOutlined,
   RocketOutlined,
 } from "@ant-design/icons";
+import onlyLogo from "../src/assets/only_logo.png"
 
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -79,7 +80,7 @@ export default function ChangePassword() {
           {/* Left Section */}
           <Col xs={0} lg={12} className="auth-left">
             <div className="auth-content">
-              <img src="/src/assets/only_logo.png" alt="Logo" className="auth-logo" />
+              <img src={onlyLogo} alt="Logo" className="auth-logo" />
 
               <Title className="auth-title">Create a New Password</Title>
 

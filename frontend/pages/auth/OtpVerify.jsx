@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./auth.css";
+import onlyLogo from "../src/assets/only_logo.png"
 
 import {
   Row,
@@ -73,7 +74,7 @@ const OtpVerify = () => {
           {/* Left Side */}
           <Col xs={0} lg={12} className="auth-left">
             <div className="auth-content">
-              <img src="/src/assets/only_logo.png" alt="Logo" className="auth-logo" />
+              <img src={onlyLogo} alt="Logo" className="auth-logo" />
 
               <Title className="auth-title">Secure Account Verification</Title>
 

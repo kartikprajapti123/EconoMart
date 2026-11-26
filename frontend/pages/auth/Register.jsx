@@ -17,6 +17,7 @@ import {
   Radio,
   Space,
 } from "antd";
+import onlyLogo from "../src/assets/only_logo.png"
 
 import {
   UserOutlined,
@@ -182,7 +183,7 @@ const Register = () => {
           {/* Left Section */}
           <Col xs={0} lg={12} className="auth-left">
             <div className="auth-content">
-              <img src="/src/assets/only_logo.png" alt="Logo" className="auth-logo" />
+              <img src={onlyLogo} alt="Logo" className="auth-logo" />
 
               <Title className="auth-title">Build Your Future Store</Title>
 
