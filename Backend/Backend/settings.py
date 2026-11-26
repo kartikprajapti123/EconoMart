@@ -102,22 +102,22 @@ DATABASES = {
         
     }
 }
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": [
-#                 {"address": "redis://127.0.0.1:6379/1", "socket_timeout": 30},
-#             ],
-#             "prefix": "economart",
-#         },
-#     },
-# }
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                {"address": "redis://127.0.0.1:6379/1", "socket_timeout": 30},
+            ],
+            "prefix": "economart",
+        },
     },
 }
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer",
+#     },
+# }
 
 
 # Password validation

@@ -8,6 +8,7 @@ from decouple import config
 from django.core.files.base import ContentFile
 import uuid
 from django.core.cache import cache
+
 # Create your views here.
 from django.contrib.auth.models import Group
 from calendar import month_abbr
@@ -459,9 +460,29 @@ class RegisterViewset(ModelViewSet):
             user_instance.otp = otp
             user_instance.save()
             token = encode_jwt(email=user_instance.email)
-
+            context = {
+                "email": user_instance.email,
+                "username": user_instance.username,
+                "otp": otp,
+            }
+            send_email = threading.Thread(
+                target=send_template_email,
+                kwargs={
+                    "subject": "Otp Verification",
+                    "template_name": "OtpVerifyEmail.html",
+                    "context": context,
+                    "recipient_list": [user_instance.email],
+                },
+            )
+            send_email.start()
             return Response(
-                {"success": True, "otp": otp,"user_type":user_instance.user_type, "verification_token": token},
+                {
+                    "success": True,
+                    "message": f"Otp Successfully Send to {user_instance.email}",
+                    "otp": otp,
+                    "user_type": user_instance.user_type,
+                    "verification_token": token,
+                },
                 status=status.HTTP_200_OK,
             )
         else:
@@ -495,7 +516,7 @@ class RegisterViewset(ModelViewSet):
                 return Response(
                     {
                         "success": True,
-                        "user_type":user_instance.user_type,
+                        "user_type": user_instance.user_type,
                         "message": f"Otp Successfully Send to {user_instance.email}",
                         "verification_token": verification_token,
                     },
@@ -545,7 +566,7 @@ class OtpVerifyViewSet(ModelViewSet):
                 {"success": False, "error": "Token is expired"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
+        print(payload.get("email"))
         if not payload.get("email"):
             return Response(
                 {"success": False, "error": "Invalid token"},
@@ -845,6 +866,7 @@ class LogoutViewSet(ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+
 class GoogleSocialAuthView(ModelViewSet):
     permission_classes = [AllowAny]
 
@@ -855,12 +877,12 @@ class GoogleSocialAuthView(ModelViewSet):
         user_type = request.data.get("user_type")
         print(temp_id)
         print(user_type)
-        
+
         # ---------------------------------------------------
         # STEP 2 : CREATE USER FROM CACHE
         # ---------------------------------------------------
         if temp_id and user_type:
-            
+
             google_data = cache.get(temp_id)
 
             if not google_data:
@@ -877,10 +899,7 @@ class GoogleSocialAuthView(ModelViewSet):
             last_name = google_data["last_name"]
             picture = google_data["picture"]
 
-            base_username = (
-                f"{first_name} {last_name}".strip()
-                or email.split("@")[0]
-            )
+            base_username = f"{first_name} {last_name}".strip() or email.split("@")[0]
 
             username = base_username
 
@@ -894,7 +913,7 @@ class GoogleSocialAuthView(ModelViewSet):
                 is_active=True,
                 is_email_verified=True,
             )
-            
+
             group = Group.objects.filter(name=user_type).first()
 
             if group:
@@ -940,7 +959,7 @@ class GoogleSocialAuthView(ModelViewSet):
         # STEP 1 : GOOGLE LOGIN
         # ---------------------------------------------------
         else:
-            
+
             if not code:
                 return Response(
                     {
@@ -977,9 +996,7 @@ class GoogleSocialAuthView(ModelViewSet):
 
             profile = requests.get(
                 "https://www.googleapis.com/oauth2/v3/userinfo",
-                headers={
-                    "Authorization": f"Bearer {access_token}"
-                },
+                headers={"Authorization": f"Bearer {access_token}"},
             ).json()
 
             email = profile.get("email")
