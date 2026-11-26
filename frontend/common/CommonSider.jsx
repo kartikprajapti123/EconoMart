@@ -34,6 +34,7 @@ import "./CommonSiderStyle.css";
 import { useDispatch, useSelector } from "react-redux";
 import { hasPermission } from "../src/utils/Permission";
 import { getSingleUserThunkApi } from "../slice/User.Slice";
+import onlyLogo from "../src/assets/only_logo.png";
 const { Sider } = Layout;
 export default function CommonSider() {
   const location = useLocation();
@@ -332,7 +333,7 @@ export default function CommonSider() {
         )}
         <Link to="/" className="sidebar-logo">
           <img
-            src="../src/assets/only_logo.png"
+            src={onlyLogo}
             alt="logo"
             className="logo-image"
             style={{ width: 60, height: 50 }}
