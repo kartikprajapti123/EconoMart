@@ -174,7 +174,7 @@ export default function ProductCreateUpdate() {
     const params = {
       no_pagination: true,
     };
-    dispatch(listProductBrandThunkApi({ params }))
+    dispatch(listProductBrandThunkApi(params))
       .unwrap()
       .then((res) => {})
       .catch((error) => {
@@ -186,9 +186,9 @@ export default function ProductCreateUpdate() {
   };
   const listColor = () => {
     const params = {
-      no_pagination: true,
+      no_pagination:true,
     };
-    dispatch(listProductColorThunkApi({ params }))
+    dispatch(listProductColorThunkApi( params ))
       .unwrap()
       .then((res) => {})
       .catch((error) => {
@@ -202,7 +202,7 @@ export default function ProductCreateUpdate() {
     const params = {
       no_pagination: true,
     };
-    dispatch(listProductSizeThunkApi({ params }))
+    dispatch(listProductSizeThunkApi(params))
       .unwrap()
       .then((res) => {})
       .catch((error) => {

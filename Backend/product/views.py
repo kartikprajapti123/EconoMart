@@ -475,7 +475,7 @@ class ProductColorViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-
+        
         no_pagination = request.query_params.get("no_pagination")
         if no_pagination:
             serializer = self.serializer_class(
